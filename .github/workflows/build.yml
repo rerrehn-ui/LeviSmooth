@@ -1,17 +1,17 @@
-
 name: Build LeviSmooth
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Java
@@ -20,41 +20,29 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Install Android NDK and CMake
-        run: |
-          export ANDROID_HOME=/usr/local/lib/android/sdk
-          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | head -n 1)
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r28b
+          local-cache: true
 
-          if [ -z "$SDKMANAGER" ]; then
-            echo "sdkmanager not found"
-            exit 1
-          fi
-
-          yes | "$SDKMANAGER" --licenses || true
-
-          "$SDKMANAGER" --install "ndk;28.2.13676358" "cmake;3.22.1"
-
-          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
-
-      - name: Install Android NDK and CMake
-        run: |
-          sdkmanager --licenses
-          sdkmanager --install "ndk;28.2.13676358" "cmake;3.22.1"
-
-      - name: Configure
+      - name: Configure Android Build
         run: |
           cmake -S . -B build \
-            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" \
             -DANDROID_ABI=arm64-v8a \
             -DANDROID_PLATFORM=android-28 \
-            -DANDROID_STL=c++_shared
+            -DANDROID_STL=c++_shared \
+            -DCMAKE_BUILD_TYPE=Release
 
-      - name: Compile
-        run: cmake --build build --config Release -j2
+      - name: Compile LeviSmooth
+        run: |
+          cmake --build build --config Release -j2
 
       - name: Package LeviSmooth
         run: |
           mkdir -p package
+
           cp build/liblevi_smooth.so package/liblevi_smooth.so
 
           cat > package/manifest.json <<'EOF'
@@ -78,3 +66,4 @@ jobs:
         with:
           name: LeviSmooth
           path: LeviSmooth.levipack
+          
