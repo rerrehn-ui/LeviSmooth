@@ -2,8 +2,12 @@
 #include <pl/ModMenu.hpp>
 
 #include "FrameMonitor.hpp"
+#include "core/FrameAnalyzer.hpp"
+#include "core/CameraSmoother.hpp"
+#include "core/FramePacer.hpp"
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 class LeviSmooth {
@@ -25,8 +29,25 @@ public:
         return monitor;
     }
 
+    static LeviSmoothCore::FrameAnalyzer& frameAnalyzer() {
+        static LeviSmoothCore::FrameAnalyzer analyzer;
+        return analyzer;
+    }
+
+    static LeviSmoothCore::CameraSmoother& cameraSmoother() {
+        static LeviSmoothCore::CameraSmoother smoother;
+        return smoother;
+    }
+
+    static LeviSmoothCore::FramePacer& framePacer() {
+        static LeviSmoothCore::FramePacer pacer;
+        return pacer;
+    }
+
     bool load() {
-        getSelf().getLogger().info("LeviSmooth loaded!");
+        getSelf().getLogger().info(
+            "LeviSmooth core systems loaded!"
+        );
         return true;
     }
 
@@ -37,7 +58,8 @@ public:
         )
             .modId(getSelf().getId())
             .description(
-                "Camera smoothing and frame pacing framework"
+                "Micro-stutter analysis, frame pacing "
+                "and camera smoothing framework"
             )
             .defaultEnabled(true)
             .onToggle(
@@ -61,8 +83,8 @@ private:
                 .type = DrawCommandType::RectFilled,
                 .x = 8.0f,
                 .y = 8.0f,
-                .w = 300.0f,
-                .h = 125.0f,
+                .w = 310.0f,
+                .h = 145.0f,
                 .color = 0xAA000000
             },
             {
@@ -78,24 +100,32 @@ private:
                 .x = 18.0f,
                 .y = 48.0f,
                 .color = 0xFF00FF00,
-                .size = 15.0f,
-                .text = "Native Module: Loaded"
-            },
-            {
-                .type = DrawCommandType::Text,
-                .x = 18.0f,
-                .y = 73.0f,
-                .color = 0xFFFFFFFF,
-                .size = 15.0f,
+                .size = 14.0f,
                 .text = "Frame Monitor: Ready"
             },
             {
                 .type = DrawCommandType::Text,
                 .x = 18.0f,
-                .y = 98.0f,
+                .y = 72.0f,
+                .color = 0xFF00FF00,
+                .size = 14.0f,
+                .text = "Frame Analyzer: Ready"
+            },
+            {
+                .type = DrawCommandType::Text,
+                .x = 18.0f,
+                .y = 96.0f,
+                .color = 0xFF00FF00,
+                .size = 14.0f,
+                .text = "Camera Smoother: Ready"
+            },
+            {
+                .type = DrawCommandType::Text,
+                .x = 18.0f,
+                .y = 120.0f,
                 .color = 0xFFFFFF00,
                 .size = 13.0f,
-                .text = "Render Hook: Not Connected"
+                .text = "Frame Pacer: Framework Ready"
             }
         };
 
