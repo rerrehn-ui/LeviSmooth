@@ -1,5 +1,8 @@
+
 #include <pl/Mod.hpp>
 #include <pl/ModMenu.hpp>
+
+#include "FrameMonitor.hpp"
 
 #include <string>
 #include <vector>
@@ -16,6 +19,11 @@ public:
 
     ll::mod::NativeMod& getSelf() const {
         return mSelf;
+    }
+
+    static LeviSmoothCore::FrameMonitor& frameMonitor() {
+        static LeviSmoothCore::FrameMonitor monitor;
+        return monitor;
     }
 
     bool load() {
