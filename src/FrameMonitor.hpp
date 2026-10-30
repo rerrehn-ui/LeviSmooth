@@ -1,6 +1,7 @@
 #pragma once
 
-#include <algorithm>
+#include "core/FrameAnalyzer.hpp"
+
 #include <chrono>
 #include <cstddef>
 #include <deque>
@@ -30,7 +31,9 @@ public:
 
     void reset() {
         mSamples.clear();
+        mAnalyzer.reset();
         mLastFrame = {};
+
         mAverageFrameTime = 0.0;
         mFps = 0.0;
         mStutterPercent = 0.0;
@@ -48,11 +51,24 @@ public:
         return mStutterPercent;
     }
 
+    double getFrameTimeVariation() const {
+        return mAnalyzer.getFrameTimeVariation();
+    }
+
+    double getStutterRate() const {
+        return mAnalyzer.getStutterRate();
+    }
+
+    std::size_t getSampleCount() const {
+        return mAnalyzer.getSampleCount();
+    }
+
 private:
     static constexpr std::size_t MAX_SAMPLES = 120;
-    static constexpr double STUTTER_THRESHOLD_MS = 33.33;
 
     void addSample(double frameTime) {
+        mAnalyzer.addFrameSample(frameTime);
+
         mSamples.push_back(frameTime);
 
         if (mSamples.size() > MAX_SAMPLES) {
@@ -60,27 +76,23 @@ private:
         }
 
         double total = 0.0;
-        std::size_t stutters = 0;
 
         for (double sample : mSamples) {
             total += sample;
-
-            if (sample > STUTTER_THRESHOLD_MS) {
-                ++stutters;
-            }
         }
 
-        mAverageFrameTime =
-            total / static_cast<double>(mSamples.size());
+        if (!mSamples.empty()) {
+            mAverageFrameTime =
+                total / static_cast<double>(mSamples.size());
 
-        mFps = 1000.0 / mAverageFrameTime;
-
-        mStutterPercent =
-            100.0 * static_cast<double>(stutters) /
-            static_cast<double>(mSamples.size());
+            mFps = 1000.0 / mAverageFrameTime;
+            mStutterPercent = mAnalyzer.getStutterRate();
+        }
     }
 
     std::deque<double> mSamples;
+    FrameAnalyzer mAnalyzer;
+
     Clock::time_point mLastFrame{};
 
     double mAverageFrameTime = 0.0;
