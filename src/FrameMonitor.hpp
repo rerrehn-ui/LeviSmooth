@@ -1,10 +1,9 @@
-
 #pragma once
 
 #include <chrono>
 #include <cstdint>
 
-namespace LeviSmooth {
+namespace LeviSmoothCore {
 
 class FrameMonitor {
 public:
