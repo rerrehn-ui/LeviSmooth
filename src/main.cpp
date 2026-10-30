@@ -1,4 +1,3 @@
-
 #include <pl/Mod.hpp>
 #include <pl/ModMenu.hpp>
 
@@ -63,7 +62,7 @@ private:
                 .x = 8.0f,
                 .y = 8.0f,
                 .w = 300.0f,
-                .h = 110.0f,
+                .h = 125.0f,
                 .color = 0xAA000000
             },
             {
@@ -78,17 +77,25 @@ private:
                 .type = DrawCommandType::Text,
                 .x = 18.0f,
                 .y = 48.0f,
-                .color = 0xFFFFFFFF,
+                .color = 0xFF00FF00,
                 .size = 15.0f,
-                .text = "Camera Smoothing: Pending"
+                .text = "Native Module: Loaded"
             },
             {
                 .type = DrawCommandType::Text,
                 .x = 18.0f,
-                .y = 72.0f,
+                .y = 73.0f,
                 .color = 0xFFFFFFFF,
                 .size = 15.0f,
-                .text = "Frame Pacing: Pending"
+                .text = "Frame Monitor: Ready"
+            },
+            {
+                .type = DrawCommandType::Text,
+                .x = 18.0f,
+                .y = 98.0f,
+                .color = 0xFFFFFF00,
+                .size = 13.0f,
+                .text = "Render Hook: Not Connected"
             }
         };
 
